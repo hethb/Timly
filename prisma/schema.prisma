@@ -1,0 +1,118 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id                String           @id @default(cuid())
+  email             String           @unique
+  name              String?
+  image             String?
+  googleAccessToken String?
+  googleRefreshToken String?
+  tokenExpiresAt    DateTime?
+
+  // Sleep schedule
+  wakeTime          String           @default("07:00")
+  sleepTime         String           @default("23:00")
+
+  // Scheduling settings (earliestTime/latestTime synced from wake/sleep)
+  earliestTime      String           @default("07:00")
+  latestTime        String           @default("22:00")
+  bufferMinutes     Int              @default(15)
+  defaultHorizonDays Int             @default(7)
+
+  // Onboarding
+  onboardingCompleted Boolean        @default(false)
+
+  tasks             Task[]
+  scheduledBlocks   ScheduledBlock[]
+  eventRankings     EventRanking[]
+  accounts          Account[]
+  sessions          Session[]
+
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Task {
+  id                 String           @id @default(cuid())
+  userId             String
+  title              String
+  durationMinutes    Int
+  frequencyPerWeek   Int              @default(1)
+  preferredStartTime String?          // e.g. "16:00"
+  preferredEndTime   String?          // e.g. "21:00"
+  priority           Int              @default(2) // 1=low, 2=medium, 3=high
+  preferredDays      Int[]            @default([]) // 0=Sun, 1=Mon, ..., 6=Sat
+  deadline           DateTime?
+  isActive           Boolean          @default(true)
+
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  scheduledBlocks ScheduledBlock[]
+
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+}
+
+model EventRanking {
+  id            String   @id @default(cuid())
+  userId        String
+  googleEventId String
+  calendarId    String   @default("primary")
+  summary       String
+  flexibility   String   @default("FIXED") // FIXED, PREFER_KEEP, FLEXIBLE, DELETABLE
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([userId, googleEventId])
+}
+
+model ScheduledBlock {
+  id            String   @id @default(cuid())
+  userId        String
+  taskId        String
+  googleEventId String?
+  startTime     DateTime
+  endTime       DateTime
+  committed     Boolean  @default(false)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+}
