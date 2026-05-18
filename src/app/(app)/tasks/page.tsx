@@ -220,7 +220,7 @@ export default function TasksPage() {
           <DialogTrigger asChild>
             <Button
               onClick={openCreate}
-              className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-md"
+              className="bg-blue-600 hover:bg-blue-700 text-white"
             >
               <Plus className="mr-2 h-4 w-4" />
               Add Task
@@ -383,7 +383,7 @@ export default function TasksPage() {
               <Button
                 onClick={handleSubmit}
                 disabled={saving || !form.title.trim()}
-                className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white"
+                className="bg-blue-600 hover:bg-blue-700 text-white"
               >
                 {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 {editingTask ? "Update Task" : "Create Task"}

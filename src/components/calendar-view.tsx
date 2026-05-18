@@ -664,7 +664,7 @@ export function CalendarView({
         createPortal(
           <div
             ref={popoverRef}
-            className="fixed z-[9999] bg-white rounded-xl shadow-xl border border-slate-200 p-4 w-72"
+            className="fixed z-[9999] bg-white rounded-xl shadow-lg border border-slate-200 p-4 w-72"
             style={{
               top: Math.max(8, Math.min(popoverPos.top, window.innerHeight - 260)),
               left: Math.max(8, Math.min(popoverPos.left, window.innerWidth - 300)),

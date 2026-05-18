@@ -186,7 +186,7 @@ export default function DashboardPage() {
         <Button
           onClick={handleQuickSchedule}
           disabled={scheduling || activeTasks.length === 0}
-          className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-md"
+          className="bg-blue-600 hover:bg-blue-700 text-white"
         >
           {scheduling ? (
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -202,7 +202,7 @@ export default function DashboardPage() {
         <Card className="border-slate-200">
           <CardContent className="pt-6">
             <div className="flex items-center gap-4">
-              <div className="h-12 w-12 rounded-xl bg-purple-50 flex items-center justify-center">
+              <div className="h-12 w-12 rounded-lg bg-purple-50 flex items-center justify-center">
                 <Calendar className="h-6 w-6 text-purple-600" />
               </div>
               <div>
@@ -218,7 +218,7 @@ export default function DashboardPage() {
         <Card className="border-slate-200">
           <CardContent className="pt-6">
             <div className="flex items-center gap-4">
-              <div className="h-12 w-12 rounded-xl bg-blue-50 flex items-center justify-center">
+              <div className="h-12 w-12 rounded-lg bg-blue-50 flex items-center justify-center">
                 <ListTodo className="h-6 w-6 text-blue-600" />
               </div>
               <div>
@@ -234,7 +234,7 @@ export default function DashboardPage() {
         <Card className="border-slate-200">
           <CardContent className="pt-6">
             <div className="flex items-center gap-4">
-              <div className="h-12 w-12 rounded-xl bg-indigo-50 flex items-center justify-center">
+              <div className="h-12 w-12 rounded-lg bg-indigo-50 flex items-center justify-center">
                 <CalendarClock className="h-6 w-6 text-indigo-600" />
               </div>
               <div>
@@ -250,7 +250,7 @@ export default function DashboardPage() {
         <Card className="border-slate-200">
           <CardContent className="pt-6">
             <div className="flex items-center gap-4">
-              <div className="h-12 w-12 rounded-xl bg-green-50 flex items-center justify-center">
+              <div className="h-12 w-12 rounded-lg bg-green-50 flex items-center justify-center">
                 <Clock className="h-6 w-6 text-green-600" />
               </div>
               <div>
@@ -427,7 +427,7 @@ export default function DashboardPage() {
               </div>
               <div className="flex gap-2">
                 <Link href="/schedule">
-                  <Button className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white">
+                  <Button className="bg-blue-600 hover:bg-blue-700 text-white">
                     Review Schedule
                     <ArrowRight className="ml-1 h-4 w-4" />
                   </Button>

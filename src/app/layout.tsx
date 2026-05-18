@@ -9,7 +9,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "AutoScheduler - Smart Calendar Task Blocker",
+  title: "Timly - Smart Calendar Scheduling",
   description:
     "Automatically schedule time blocks for your tasks by finding open gaps in your Google Calendar.",
 };

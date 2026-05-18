@@ -60,28 +60,28 @@ const FLEXIBILITY_OPTIONS: {
     label: "Fixed",
     description: "Can't move this",
     icon: <Shield className="h-4 w-4" />,
-    color: "bg-slate-100 text-slate-700 border-slate-300",
+    color: "bg-slate-50 text-slate-700 border-slate-200",
   },
   {
     value: "PREFER_KEEP",
     label: "Prefer to Keep",
     description: "Would rather not move",
     icon: <ShieldAlert className="h-4 w-4" />,
-    color: "bg-blue-50 text-blue-700 border-blue-300",
+    color: "bg-blue-50 text-blue-700 border-blue-200",
   },
   {
     value: "FLEXIBLE",
     label: "Flexible",
     description: "Okay to move",
     icon: <Shuffle className="h-4 w-4" />,
-    color: "bg-green-50 text-green-700 border-green-300",
+    color: "bg-green-50 text-green-700 border-green-200",
   },
   {
     value: "DELETABLE",
     label: "Can Delete",
     description: "Don't need this",
     icon: <Trash2 className="h-4 w-4" />,
-    color: "bg-red-50 text-red-700 border-red-300",
+    color: "bg-red-50 text-red-700 border-red-200",
   },
 ];
 
@@ -110,7 +110,6 @@ export default function OnboardingPage() {
   const [saving, setSaving] = useState(false);
   const [eventsLoading, setEventsLoading] = useState(false);
 
-  // Fetch existing settings
   useEffect(() => {
     fetch("/api/settings")
       .then((r) => r.json())
@@ -121,7 +120,6 @@ export default function OnboardingPage() {
       .catch(() => {});
   }, []);
 
-  // Fetch events when moving to step 2
   const fetchEvents = useCallback(async () => {
     setEventsLoading(true);
     try {
@@ -129,12 +127,10 @@ export default function OnboardingPage() {
       const data = await res.json();
       setEvents(data);
 
-      // Also fetch existing rankings
       const rankingsRes = await fetch("/api/events/rankings");
       const existingRankings = await rankingsRes.json();
       const rankingsMap: Record<string, EventRanking> = {};
 
-      // Pre-populate rankings from existing data
       if (Array.isArray(existingRankings)) {
         for (const r of existingRankings) {
           rankingsMap[r.googleEventId] = {
@@ -146,7 +142,6 @@ export default function OnboardingPage() {
         }
       }
 
-      // Default all events to FIXED if no existing ranking
       for (const event of data) {
         if (!rankingsMap[event.id]) {
           rankingsMap[event.id] = {
@@ -217,7 +212,6 @@ export default function OnboardingPage() {
     });
   };
 
-  // Summary stats for step 3
   const rankingCounts = Object.values(rankings).reduce(
     (acc, r) => {
       acc[r.flexibility] = (acc[r.flexibility] || 0) + 1;
@@ -226,42 +220,41 @@ export default function OnboardingPage() {
     {} as Record<string, number>
   );
 
-  // Sleep bar calculation (24h visual)
   const wakeHour =
     parseInt(wakeTime.split(":")[0]) + parseInt(wakeTime.split(":")[1]) / 60;
   const sleepHour =
     parseInt(sleepTime.split(":")[0]) + parseInt(sleepTime.split(":")[1]) / 60;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
-      <div className="mx-auto max-w-3xl px-4 py-8">
+    <div className="min-h-screen bg-slate-50">
+      <div className="mx-auto max-w-2xl px-4 py-10">
         {/* Progress Bar */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-2">
+        <div className="mb-10">
+          <div className="flex items-center justify-between mb-3">
             {[1, 2, 3].map((s) => (
               <div key={s} className="flex items-center">
                 <div
-                  className={`flex items-center justify-center w-10 h-10 rounded-full text-sm font-semibold transition-all ${
+                  className={`flex items-center justify-center w-9 h-9 rounded-full text-sm font-semibold transition-colors ${
                     s < step
-                      ? "bg-green-500 text-white"
+                      ? "bg-blue-600 text-white"
                       : s === step
-                        ? "bg-blue-600 text-white ring-4 ring-blue-200"
-                        : "bg-gray-200 text-gray-500"
+                        ? "bg-blue-600 text-white ring-2 ring-blue-200"
+                        : "bg-slate-200 text-slate-400"
                   }`}
                 >
-                  {s < step ? <CheckCircle2 className="h-5 w-5" /> : s}
+                  {s < step ? <CheckCircle2 className="h-4 w-4" /> : s}
                 </div>
                 {s < 3 && (
                   <div
-                    className={`w-24 sm:w-32 md:w-40 h-1 mx-2 rounded ${
-                      s < step ? "bg-green-500" : "bg-gray-200"
+                    className={`w-20 sm:w-28 md:w-36 h-0.5 mx-2 rounded ${
+                      s < step ? "bg-blue-600" : "bg-slate-200"
                     }`}
                   />
                 )}
               </div>
             ))}
           </div>
-          <div className="flex justify-between text-xs text-gray-500">
+          <div className="flex justify-between text-xs text-slate-400 px-1">
             <span>Sleep Schedule</span>
             <span>Rank Events</span>
             <span>Confirm</span>
@@ -270,69 +263,67 @@ export default function OnboardingPage() {
 
         {/* Step 1: Sleep Schedule */}
         {step === 1 && (
-          <Card className="p-8">
+          <Card className="p-6">
             <div className="text-center mb-8">
-              <div className="inline-flex items-center gap-2 mb-4">
-                <Sun className="h-6 w-6 text-yellow-500" />
-                <Moon className="h-6 w-6 text-indigo-500" />
+              <div className="inline-flex items-center gap-2 mb-3">
+                <Sun className="h-5 w-5 text-amber-500" />
+                <Moon className="h-5 w-5 text-blue-500" />
               </div>
-              <h1 className="text-2xl font-bold text-gray-900 mb-2">
+              <h1 className="text-xl font-bold text-slate-900 mb-1.5">
                 Set Your Sleep Schedule
               </h1>
-              <p className="text-gray-500">
+              <p className="text-sm text-slate-500">
                 We'll only schedule tasks during your waking hours.
               </p>
             </div>
 
-            <div className="grid grid-cols-2 gap-8 mb-8">
+            <div className="grid grid-cols-2 gap-6 mb-8">
               <div>
-                <Label className="flex items-center gap-2 mb-2 text-base">
-                  <Sun className="h-4 w-4 text-yellow-500" />
+                <Label className="flex items-center gap-2 mb-2 text-sm">
+                  <Sun className="h-3.5 w-3.5 text-amber-500" />
                   Wake Up Time
                 </Label>
                 <Input
                   type="time"
                   value={wakeTime}
                   onChange={(e) => setWakeTime(e.target.value)}
-                  className="text-lg h-12"
+                  className="h-10"
                 />
               </div>
               <div>
-                <Label className="flex items-center gap-2 mb-2 text-base">
-                  <Moon className="h-4 w-4 text-indigo-500" />
+                <Label className="flex items-center gap-2 mb-2 text-sm">
+                  <Moon className="h-3.5 w-3.5 text-blue-500" />
                   Bedtime
                 </Label>
                 <Input
                   type="time"
                   value={sleepTime}
                   onChange={(e) => setSleepTime(e.target.value)}
-                  className="text-lg h-12"
+                  className="h-10"
                 />
               </div>
             </div>
 
             {/* 24h bar visualization */}
             <div className="mb-8">
-              <Label className="text-sm text-gray-500 mb-2 block">
+              <Label className="text-xs text-slate-400 mb-2 block">
                 Your Day at a Glance
               </Label>
-              <div className="relative h-10 rounded-lg overflow-hidden bg-indigo-900/80">
-                {/* Awake portion */}
+              <div className="relative h-8 rounded-lg overflow-hidden bg-slate-800">
                 <div
-                  className="absolute top-0 h-full bg-gradient-to-r from-yellow-300 via-sky-300 to-orange-300 rounded"
+                  className="absolute top-0 h-full bg-blue-400 rounded"
                   style={{
                     left: `${(wakeHour / 24) * 100}%`,
                     width: `${((sleepHour - wakeHour) / 24) * 100}%`,
                   }}
                 />
-                {/* Hour markers */}
                 {[0, 6, 12, 18, 24].map((h) => (
                   <div
                     key={h}
-                    className="absolute top-0 h-full border-l border-white/20"
+                    className="absolute top-0 h-full border-l border-white/15"
                     style={{ left: `${(h / 24) * 100}%` }}
                   >
-                    <span className="absolute -bottom-5 -translate-x-1/2 text-[10px] text-gray-400">
+                    <span className="absolute -bottom-5 -translate-x-1/2 text-[10px] text-slate-400">
                       {h === 0
                         ? "12am"
                         : h === 6
@@ -346,19 +337,19 @@ export default function OnboardingPage() {
                   </div>
                 ))}
               </div>
-              <div className="flex justify-between mt-8 text-xs text-gray-400">
-                <span className="flex items-center gap-1">
-                  <div className="w-3 h-3 rounded bg-indigo-900/80" /> Sleep
+              <div className="flex justify-between mt-7 text-xs text-slate-400">
+                <span className="flex items-center gap-1.5">
+                  <div className="w-2.5 h-2.5 rounded bg-slate-800" /> Sleep
                 </span>
-                <span className="flex items-center gap-1">
-                  <div className="w-3 h-3 rounded bg-gradient-to-r from-yellow-300 to-sky-300" />{" "}
+                <span className="flex items-center gap-1.5">
+                  <div className="w-2.5 h-2.5 rounded bg-blue-400" />{" "}
                   Awake ({Math.round(sleepHour - wakeHour)}h)
                 </span>
               </div>
             </div>
 
             <div className="flex justify-end">
-              <Button onClick={handleNext} size="lg" className="gap-2">
+              <Button onClick={handleNext} size="lg" className="gap-2 bg-blue-600 hover:bg-blue-700 text-white">
                 Next: Rank Your Events
                 <ChevronRight className="h-4 w-4" />
               </Button>
@@ -368,13 +359,13 @@ export default function OnboardingPage() {
 
         {/* Step 2: Rank Events */}
         {step === 2 && (
-          <Card className="p-8">
+          <Card className="p-6">
             <div className="text-center mb-6">
-              <Calendar className="h-6 w-6 text-blue-500 mx-auto mb-2" />
-              <h1 className="text-2xl font-bold text-gray-900 mb-2">
+              <Calendar className="h-5 w-5 text-blue-600 mx-auto mb-2" />
+              <h1 className="text-xl font-bold text-slate-900 mb-1.5">
                 Rank Your Events
               </h1>
-              <p className="text-gray-500">
+              <p className="text-sm text-slate-500">
                 Tell us which events are flexible so we can schedule around
                 them.
               </p>
@@ -382,7 +373,7 @@ export default function OnboardingPage() {
 
             {/* Bulk actions */}
             <div className="flex flex-wrap gap-2 mb-6 justify-center">
-              <span className="text-sm text-gray-500 self-center mr-2">
+              <span className="text-xs text-slate-400 self-center mr-1">
                 Mark all as:
               </span>
               {FLEXIBILITY_OPTIONS.map((opt) => (
@@ -391,7 +382,7 @@ export default function OnboardingPage() {
                   variant="outline"
                   size="sm"
                   onClick={() => bulkSetFlexibility(opt.value)}
-                  className="gap-1"
+                  className="gap-1 text-xs"
                 >
                   {opt.icon}
                   {opt.label}
@@ -401,25 +392,25 @@ export default function OnboardingPage() {
 
             {eventsLoading ? (
               <div className="flex items-center justify-center py-16">
-                <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
-                <span className="ml-3 text-gray-500">
+                <Loader2 className="h-6 w-6 animate-spin text-blue-600" />
+                <span className="ml-3 text-sm text-slate-500">
                   Loading your calendar events...
                 </span>
               </div>
             ) : events.length === 0 ? (
-              <div className="text-center py-16 text-gray-400">
-                <Calendar className="h-12 w-12 mx-auto mb-3 opacity-50" />
-                <p>No events found in the next 7 days.</p>
+              <div className="text-center py-16 text-slate-400">
+                <Calendar className="h-10 w-10 mx-auto mb-3 opacity-50" />
+                <p className="text-sm">No events found in the next 7 days.</p>
               </div>
             ) : (
-              <div className="space-y-6 max-h-[50vh] overflow-y-auto pr-2">
+              <div className="space-y-5 max-h-[50vh] overflow-y-auto pr-1">
                 {Object.entries(groupEventsByDay(events)).map(
                   ([day, dayEvents]) => (
                     <div key={day}>
-                      <h3 className="text-sm font-semibold text-gray-700 mb-2 sticky top-0 bg-white py-1">
+                      <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2 sticky top-0 bg-white py-1">
                         {day}
                       </h3>
-                      <div className="space-y-2">
+                      <div className="space-y-1.5">
                         {dayEvents.map((event) => {
                           const ranking = rankings[event.id];
                           const flex = ranking?.flexibility || "FIXED";
@@ -439,19 +430,19 @@ export default function OnboardingPage() {
                           return (
                             <div
                               key={event.id}
-                              className="flex items-center gap-3 p-3 rounded-lg border bg-white hover:shadow-sm transition-shadow"
+                              className="flex items-center gap-3 p-3 rounded-lg border border-slate-200 bg-white"
                             >
                               <div
-                                className="w-1 self-stretch rounded-full flex-shrink-0"
+                                className="w-0.5 self-stretch rounded-full flex-shrink-0"
                                 style={{
                                   backgroundColor: event.color || "#4285f4",
                                 }}
                               />
                               <div className="flex-1 min-w-0">
-                                <p className="font-medium text-sm text-gray-900 truncate">
+                                <p className="font-medium text-sm text-slate-900 truncate">
                                   {event.title}
                                 </p>
-                                <p className="text-xs text-gray-400">
+                                <p className="text-xs text-slate-400">
                                   {event.allDay
                                     ? "All day"
                                     : `${startTime} - ${endTime}`}
@@ -468,7 +459,7 @@ export default function OnboardingPage() {
                                   )
                                 }
                               >
-                                <SelectTrigger className="w-44">
+                                <SelectTrigger className="w-40">
                                   <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -483,7 +474,7 @@ export default function OnboardingPage() {
                                           <span className="text-sm">
                                             {opt.label}
                                           </span>
-                                          <span className="text-xs text-gray-400 ml-1">
+                                          <span className="text-xs text-slate-400 ml-1">
                                             - {opt.description}
                                           </span>
                                         </div>
@@ -507,7 +498,7 @@ export default function OnboardingPage() {
                 <ChevronLeft className="h-4 w-4" />
                 Back
               </Button>
-              <Button onClick={handleNext} size="lg" className="gap-2">
+              <Button onClick={handleNext} size="lg" className="gap-2 bg-blue-600 hover:bg-blue-700 text-white">
                 Next: Review
                 <ChevronRight className="h-4 w-4" />
               </Button>
@@ -517,36 +508,36 @@ export default function OnboardingPage() {
 
         {/* Step 3: Confirmation */}
         {step === 3 && (
-          <Card className="p-8">
+          <Card className="p-6">
             <div className="text-center mb-8">
-              <CheckCircle2 className="h-8 w-8 text-green-500 mx-auto mb-2" />
-              <h1 className="text-2xl font-bold text-gray-900 mb-2">
+              <CheckCircle2 className="h-6 w-6 text-green-600 mx-auto mb-2" />
+              <h1 className="text-xl font-bold text-slate-900 mb-1.5">
                 You're All Set!
               </h1>
-              <p className="text-gray-500">
+              <p className="text-sm text-slate-500">
                 Review your setup before we start scheduling.
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
               {/* Sleep schedule summary */}
-              <Card className="p-5 bg-indigo-50/50 border-indigo-100">
-                <h3 className="font-semibold text-gray-900 flex items-center gap-2 mb-3">
-                  <Moon className="h-4 w-4 text-indigo-500" />
+              <Card className="p-5 bg-slate-50 border-slate-200">
+                <h3 className="font-semibold text-sm text-slate-900 flex items-center gap-2 mb-3">
+                  <Moon className="h-4 w-4 text-blue-500" />
                   Sleep Schedule
                 </h3>
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-gray-500">Wake up</span>
-                    <span className="font-medium">{wakeTime}</span>
+                    <span className="text-slate-500">Wake up</span>
+                    <span className="font-medium text-slate-900">{wakeTime}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-500">Bedtime</span>
-                    <span className="font-medium">{sleepTime}</span>
+                    <span className="text-slate-500">Bedtime</span>
+                    <span className="font-medium text-slate-900">{sleepTime}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-500">Available hours</span>
-                    <span className="font-medium">
+                    <span className="text-slate-500">Available hours</span>
+                    <span className="font-medium text-slate-900">
                       {Math.round(sleepHour - wakeHour)}h
                     </span>
                   </div>
@@ -554,15 +545,15 @@ export default function OnboardingPage() {
               </Card>
 
               {/* Event rankings summary */}
-              <Card className="p-5 bg-blue-50/50 border-blue-100">
-                <h3 className="font-semibold text-gray-900 flex items-center gap-2 mb-3">
-                  <Calendar className="h-4 w-4 text-blue-500" />
+              <Card className="p-5 bg-slate-50 border-slate-200">
+                <h3 className="font-semibold text-sm text-slate-900 flex items-center gap-2 mb-3">
+                  <Calendar className="h-4 w-4 text-blue-600" />
                   Event Rankings
                 </h3>
                 <div className="space-y-2 text-sm">
                   {FLEXIBILITY_OPTIONS.map((opt) => (
                     <div key={opt.value} className="flex justify-between">
-                      <span className="text-gray-500 flex items-center gap-1">
+                      <span className="text-slate-500 flex items-center gap-1.5">
                         {opt.icon} {opt.label}
                       </span>
                       <Badge variant="secondary" className="text-xs">
@@ -570,9 +561,9 @@ export default function OnboardingPage() {
                       </Badge>
                     </div>
                   ))}
-                  <div className="flex justify-between pt-2 border-t">
-                    <span className="text-gray-500">Total</span>
-                    <span className="font-medium">
+                  <div className="flex justify-between pt-2 border-t border-slate-200">
+                    <span className="text-slate-500">Total</span>
+                    <span className="font-medium text-slate-900">
                       {Object.values(rankings).length} events
                     </span>
                   </div>
@@ -589,7 +580,7 @@ export default function OnboardingPage() {
                 onClick={handleComplete}
                 size="lg"
                 disabled={saving}
-                className="gap-2 bg-green-600 hover:bg-green-700"
+                className="gap-2 bg-blue-600 hover:bg-blue-700 text-white"
               >
                 {saving ? (
                   <>

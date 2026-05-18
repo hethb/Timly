@@ -352,7 +352,7 @@ export default function SettingsPage() {
         <Button
           onClick={handleSave}
           disabled={saving}
-          className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-md"
+          className="bg-blue-600 hover:bg-blue-700 text-white transition-colors"
         >
           {saving ? (
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
